@@ -1,4 +1,3 @@
-import Image from "next/image";
 import { LampDemo } from "./components/ui/lamp";
 import { InfiniteMovingCardsTestimonials } from "./components/ui/infinite-moving-cards";
 import {Navbar} from "./components/ui/navbar-menu";

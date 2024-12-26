@@ -124,7 +124,7 @@ return (
     )}
   >
     <div className="logo-tile-caption shadow-md text-center text-white font-bold text-4xl">
-      We've worked with
+      We&apos;ve worked with
     </div>
     <ul
       ref={scrollerRef}
@@ -141,7 +141,7 @@ return (
             background:
               "linear-gradient(180deg, var(--slate-800), var(--slate-900))",
           }}
-          key={item.alt}
+          key={idx}
         >
           <div className="logo-tile p-4 rounded-lg flex items-center justify-center">
             <Image

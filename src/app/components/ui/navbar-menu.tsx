@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import { motion } from "framer-motion";
-import Link from "next/link";
+import Link, { LinkProps } from "next/link"; // Import Link and LinkProps
 import Image from "next/image";
 import { cn } from "@/lib/utils";
 
@@ -12,6 +12,18 @@ const transition = {
   stiffness: 100,
   restDelta: 0.001,
   restSpeed: 0.001,
+};
+
+interface HoveredLinkProps extends LinkProps {
+  children: React.ReactNode; // Specify that children can be any valid React node
+}
+
+export const HoveredLink = ({ children, ...rest }: HoveredLinkProps) => {
+  return (
+    <Link {...rest} className="text-slate-400 hover:text-slate-200">
+      {children}
+    </Link>
+  );
 };
 
 export function Navbar({ className }: { className?: string }) {
@@ -63,6 +75,7 @@ export function Navbar({ className }: { className?: string }) {
             <HoveredLink href="/team">Team</HoveredLink>
             <HoveredLink href="/enterprise">Enterprise</HoveredLink>
           </div>
+        ```typescript
         </MenuItem>
       </Menu>
     </div>
@@ -154,14 +167,6 @@ export const ProductItem = ({
         <h4 className="text-xl font-bold mb-1 text-slate-100">{title}</h4>
         <p className="text-slate-400 text-sm max-w-[10rem]">{description}</p>
       </div>
-    </Link>
-  );
-};
-
-export const HoveredLink = ({ children, ...rest }: any) => {
-  return (
-    <Link {...rest} className="text-slate-400 hover:text-slate-200">
-      {children}
     </Link>
   );
 };

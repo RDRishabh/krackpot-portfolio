@@ -33,7 +33,7 @@ export const LampContainer = ({
 
   const isPhone = useMediaQuery({ maxWidth: 640 }); // Tailwind `sm` breakpoint
   const isTablet = useMediaQuery({ minWidth: 641, maxWidth: 1024 }); // Tailwind `md` breakpoint
-  const isLaptop = useMediaQuery({ minWidth: 1025 });
+  // const isLaptop = useMediaQuery({ minWidth: 1025 });
 
   const initialWidth = isPhone ? "8rem" : isTablet ? "15rem" : "20rem";
   const whileInViewWidth = isPhone ? "20rem" : isTablet ? "25rem" : "40rem";

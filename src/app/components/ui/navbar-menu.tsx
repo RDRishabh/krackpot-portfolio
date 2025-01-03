@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import Link, { LinkProps } from "next/link";
 
 import { cn } from "@/lib/utils";
-import { div } from "framer-motion/client";
+// import { div } from "framer-motion/client";
 
 // Transition for animations
 const transition = {
@@ -154,7 +154,7 @@ export const Navbar = ({ className }: { className?: string }) => {
                     {navData
                       .find((item) => item.title === activeSection)
                       ?.links?.map((link) => (
-                        <div className="border-b border-white p-2">
+                        <div className="border-b border-white p-2" key={link.href}>
                           <HoveredLink key={link.href} href={link.href}>
                             {link.name}
                           </HoveredLink>
@@ -167,7 +167,7 @@ export const Navbar = ({ className }: { className?: string }) => {
                     {navData
                       .find((item) => item.title === activeSection)
                       ?.products?.map((product) => (
-                        <div className="border-b border-white p-2">
+                        <div className="border-b border-white p-2" key={product.href}>
                           <ProductItem key={product.href} {...product} />
                         </div>
                       ))}

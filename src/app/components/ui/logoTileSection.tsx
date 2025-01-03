@@ -123,7 +123,7 @@ return (
       className
     )}
   >
-    <div className="logo-tile-caption shadow-md text-center text-white font-bold text-4xl">
+    <div className="logo-tile-caption shadow-md text-center text-white font-bold text-2xl md:text-4xl ">
       We&apos;ve worked with
     </div>
     <ul
@@ -136,7 +136,7 @@ return (
     >
       {items.map((item, idx) => (
         <li
-          className="w-[350px] max-w-full relative rounded-2xl border border-b-0 flex-shrink-0 border-slate-700 "
+          className="w-[250px] md:w-[350px] max-w-full relative rounded-2xl border border-b-0 flex-shrink-0 border-slate-700 "
           style={{
             background:
               "linear-gradient(180deg, var(--slate-800), var(--slate-900))",

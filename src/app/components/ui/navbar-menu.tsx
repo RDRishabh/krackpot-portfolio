@@ -1,172 +1,241 @@
 "use client";
+
 import React, { useState } from "react";
 import { motion } from "framer-motion";
-import Link, { LinkProps } from "next/link"; // Import Link and LinkProps
-import Image from "next/image";
+import Link from "next/link";
 import { cn } from "@/lib/utils";
 
+// Transition for animations
 const transition = {
   type: "spring",
   mass: 0.5,
   damping: 11.5,
   stiffness: 100,
-  restDelta: 0.001,
-  restSpeed: 0.001,
 };
 
-interface HoveredLinkProps extends LinkProps {
-  children: React.ReactNode; // Specify that children can be any valid React node
-}
+// JSON for navigation structure
+const navData = [
+  {
+    title: "Services",
+    links: [
+      { name: "Web Development", href: "/web-dev" },
+      { name: "Interface Design", href: "/interface-design" },
+      { name: "Search Engine Optimization", href: "/seo" },
+      { name: "Branding", href: "/branding" },
+    ],
+  },
+  {
+    title: "Products",
+    products: [
+      {
+        name: "Algochurn",
+        href: "https://algochurn.com",
+        description: "Prepare for tech interviews like never before.",
+        image: "",
+      },
+      {
+        name: "Tailwind Master Kit",
+        href: "https://tailwindmasterkit.com",
+        description: "Production ready Tailwind CSS components.",
+        image: "",
+      },
+      {
+        name: "Moonbeam",
+        href: "https://gomoonbeam.com",
+        description: "Go from idea to blog in minutes.",
+        image: "",
+      },
+      {
+        name: "Rogue",
+        href: "https://userogue.com",
+        description: "Respond to RFPs 10x faster using AI.",
+        image: "",
+      },
+    ],
+  },
+  {
+    title: "Pricing",
+    links: [
+      { name: "Hobby", href: "/hobby" },
+      { name: "Individual", href: "/individual" },
+      { name: "Team", href: "/team" },
+      { name: "Enterprise", href: "/enterprise" },
+    ],
+  },
+];
 
-export const HoveredLink = ({ children, ...rest }: HoveredLinkProps) => {
+// Export Navbar so it can be imported in other files
+export const Navbar = ({ className }: { className?: string }) => {
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [activeSection, setActiveSection] = useState<string | null>(null);
+  const [activeContent, setActiveContent] = useState<"links" | "products" | null>(null);
+
+  const handleCategoryClick = (category: string, contentType: "links" | "products" | null) => {
+    setActiveSection(category);
+    setActiveContent(contentType);
+  };
+
+  const handleBackButtonClick = () => {
+    setActiveSection(null);
+    setActiveContent(null);
+  };
+
   return (
-    <Link {...rest} className="text-slate-400 hover:text-slate-200">
-      {children}
-    </Link>
-  );
-};
+    <div className={cn("fixed top-0 inset-x-0 z-50", className)}>
+      {/* Desktop Navbar */}
+      <div className="hidden md:block">
+        <nav className="flex justify-center space-x-8 py-4 bg-slate-950 border-b border-slate-300">
+          {navData.map((item) => (
+            <Dropdown key={item.title} item={item} />
+          ))}
+        </nav>
+      </div>
 
-export function Navbar({ className }: { className?: string }) {
-  const [active, setActive] = useState<string | null>(null);
-
-  return (
-    <div className={cn("fixed top-10 inset-x-0 max-w-2xl mx-auto z-50", className)}>
-      <Menu setActive={setActive}>
-        <MenuItem setActive={setActive} active={active} item="Services">
-          <div className="flex flex-col space-y-4 text-sm">
-            <HoveredLink href="/web-dev">Web Development</HoveredLink>
-            <HoveredLink href="/interface-design">Interface Design</HoveredLink>
-            <HoveredLink href="/seo">Search Engine Optimization</HoveredLink>
-            <HoveredLink href="/branding">Branding</HoveredLink>
-          </div>
-        </MenuItem>
-        <MenuItem setActive={setActive} active={active} item="Products">
-          <div className="text-sm grid grid-cols-2 gap-10 p-4">
-            <ProductItem
-              title="Algochurn"
-              href="https://algochurn.com"
-              src=""
-              description="Prepare for tech interviews like never before."
-            />
-            <ProductItem
-              title="Tailwind Master Kit"
-              href="https://tailwindmasterkit.com"
-              src=""
-              description="Production ready Tailwind CSS components for your next project."
-            />
-            <ProductItem
-              title="Moonbeam"
-              href="https://gomoonbeam.com"
-              src=""
-              description="Never write from scratch again. Go from idea to blog in minutes."
-            />
-            <ProductItem
-              title="Rogue"
-              href="https://userogue.com"
-              src=""
-              description="Respond to government RFPs, RFIs and RFQs 10x faster using AI."
-            />
-          </div>
-        </MenuItem>
-        <MenuItem setActive={setActive} active={active} item="Pricing">
-          <div className="flex flex-col space-y-4 text-sm">
-            <HoveredLink href="/hobby">Hobby</HoveredLink>
-            <HoveredLink href="/individual">Individual</HoveredLink>
-            <HoveredLink href="/team">Team</HoveredLink>
-            <HoveredLink href="/enterprise">Enterprise</HoveredLink>
-          </div>
-        ```typescript
-        </MenuItem>
-      </Menu>
-    </div>
-  );
-}
-
-export const MenuItem = ({
-  setActive,
-  active,
-  item,
-  children,
-}: {
-  setActive: (item: string) => void;
-  active: string | null;
-  item: string;
-  children?: React.ReactNode;
-}) => {
-  return (
-    <div onMouseEnter={() => setActive(item)} className="relative">
-      <motion.p
-        transition={{ duration: 0.3 }}
-        className="cursor-pointer text-slate-100 hover:opacity-[0.9]"
+      {/* Hamburger Button for Mobile */}
+      <button
+        className="block md:hidden fixed top-4 right-4 z-50 bg-slate-800 p-2 rounded-full shadow-lg"
+        onClick={() => setIsSidebarOpen(true)}
+        aria-label="Open Menu"
+        aria-expanded={isSidebarOpen ? "true" : "false"}
       >
-        {item}
-      </motion.p>
-      {active !== null && (
+        <span className="block w-6 h-0.5 bg-slate-200 mb-1"></span>
+        <span className="block w-6 h-0.5 bg-slate-200 mb-1"></span>
+        <span className="block w-6 h-0.5 bg-slate-200"></span>
+      </button>
+
+      {/* Mobile Sidebar */}
+      {isSidebarOpen && (
         <motion.div
-          initial={{ opacity: 0, scale: 0.85, y: 10 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          transition={transition}
+          initial={{ x: "100%" }}
+          animate={{ x: 0 }}
+          exit={{ x: "100%" }}
+          transition={{ ...transition, ease: "easeInOut" }}
+          className="fixed top-0 right-0 w-64 h-full bg-slate-950 shadow-lg z-50 p-4"
         >
-          {active === item && (
-            <div className="absolute top-[calc(100%_+_1.2rem)] left-1/2 transform -translate-x-1/2 pt-4">
-              <motion.div
-                transition={transition}
-                layoutId="active"
-                className="bg-slate-950 backdrop-blur-sm rounded-2xl overflow-hidden border border-slate-300 shadow-xl"
+          <button
+            className="text-slate-200 text-2xl absolute top-4 right-4"
+            onClick={() => setIsSidebarOpen(false)}
+            aria-label="Close Menu"
+          >
+            &times;
+          </button>
+          <div className="flex flex-col space-y-6 mt-6">
+          {activeSection ? (
+            <div>
+              {/* Back Button */}
+              <button
+                className="text-slate-200 text-lg"
+                onClick={handleBackButtonClick}
               >
-                <motion.div layout className="w-max h-full p-4">
-                  {children}
-                </motion.div>
-              </motion.div>
+                &larr; 
+              </button>
+
+              {/* Content for the selected section */}
+              <div className="mt-4">
+                {activeContent === "links" && (
+                  <div className="flex flex-col space-y-2">
+                    {navData
+                      .find((item) => item.title === activeSection)
+                      ?.links?.map((link) => (
+                        <HoveredLink key={link.href} href={link.href}>
+                          {link.name}
+                        </HoveredLink>
+                      ))}
+                  </div>
+                )}
+                {activeContent === "products" && (
+                  <div className="grid grid-cols-1 gap-4">
+                    {navData
+                      .find((item) => item.title === activeSection)
+                      ?.products?.map((product) => (
+                        <ProductItem key={product.href} {...product} />
+                      ))}
+                  </div>
+                )}
+              </div>
             </div>
+          ) : (
+            navData.map((item) => (
+              <SidebarItem
+                key={item.title}
+                item={item}
+                onCategoryClick={handleCategoryClick}
+              />
+            ))
           )}
+        </div>
         </motion.div>
       )}
     </div>
   );
 };
 
-export const Menu = ({
-  setActive,
-  children,
-}: {
-  setActive: (item: string | null) => void;
-  children: React.ReactNode;
-}) => {
+function Dropdown({ item }: { item: typeof navData[number] }) {
   return (
-    <nav
-      onMouseLeave={() => setActive(null)}
-      className="relative rounded-full border border-slate-300 bg-slate-950 shadow-input flex justify-center space-x-4 px-8 py-4"
-    >
-      {children}
-    </nav>
-  );
-};
-
-export const ProductItem = ({
-  title,
-  description,
-  href,
-  src,
-}: {
-  title: string;
-  description: string;
-  href: string;
-  src: string;
-}) => {
-  return (
-    <Link href={href} className="flex space-x-2">
-      <Image
-        src={src}
-        width={140}
-        height={70}
-        alt={title}
-        className="flex-shrink-0 rounded-md shadow-2xl"
-      />
-      <div>
-        <h4 className="text-xl font-bold mb-1 text-slate-100">{title}</h4>
-        <p className="text-slate-400 text-sm max-w-[10rem]">{description}</p>
+    <div className="group relative">
+      <button className="text-slate-200 hover:underline">{item.title}</button>
+      <div className="absolute hidden group-hover:block bg-slate-950 p-4 rounded-lg shadow-lg">
+        {item.links ? (
+          <div className="flex flex-col space-y-2">
+            {item.links.map((link) => (
+              <HoveredLink key={link.href} href={link.href}>
+                {link.name}
+              </HoveredLink>
+            ))}
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 gap-4">
+            {item.products?.map((product) => (
+              <ProductItem key={product.href} {...product} />
+            ))}
+          </div>
+        )}
       </div>
+    </div>
+  );
+}
+
+function SidebarItem({
+  item,
+  onCategoryClick,
+}: {
+  item: typeof navData[number];
+  onCategoryClick: (category: string, contentType: "links" | "products" | null) => void;
+}) {
+  return (
+    <div>
+      {/* Main category button */}
+      <button
+        className="text-slate-100 text-xl font-bold"
+        onClick={() => onCategoryClick(item.title, item.links ? "links" : "products")}
+      >
+        {item.title}
+      </button>
+    </div>
+  );
+}
+
+function HoveredLink({ children, href }: { children: React.ReactNode; href: string }) {
+  return (
+    <Link href={href} className="text-slate-400 hover:text-slate-200">
+      {children}
     </Link>
   );
-};
+}
+
+function ProductItem({
+  name,
+  description,
+  href,
+}: {
+  name: string;
+  description: string;
+  href: string;
+}) {
+  return (
+    <Link href={href} className="flex flex-col space-y-1">
+      <h5 className="text-slate-100 font-bold">{name}</h5>
+      <p className="text-slate-400 text-sm">{description}</p>
+    </Link>
+  );
+}

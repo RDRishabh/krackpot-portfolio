@@ -2,8 +2,10 @@
 
 import React, { useState } from "react";
 import { motion } from "framer-motion";
-import Link from "next/link";
+import Link, { LinkProps } from "next/link";
+
 import { cn } from "@/lib/utils";
+import { div } from "framer-motion/client";
 
 // Transition for animations
 const transition = {
@@ -64,11 +66,24 @@ const navData = [
   },
 ];
 
+interface HoveredLinkProps extends LinkProps {
+  children: React.ReactNode; // Specify that children can be any valid React node
+}
+
+export const HoveredLink = ({ children, ...rest }: HoveredLinkProps) => {
+  return (
+    <Link {...rest} className="text-slate-400 hover:text-slate-200">
+      {children}
+    </Link>
+  );
+};
+
 // Export Navbar so it can be imported in other files
 export const Navbar = ({ className }: { className?: string }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [activeSection, setActiveSection] = useState<string | null>(null);
   const [activeContent, setActiveContent] = useState<"links" | "products" | null>(null);
+  const [active, setActive] = useState<string | null>(null);
 
   const handleCategoryClick = (category: string, contentType: "links" | "products" | null) => {
     setActiveSection(category);
@@ -84,10 +99,12 @@ export const Navbar = ({ className }: { className?: string }) => {
     <div className={cn("fixed top-0 inset-x-0 z-50", className)}>
       {/* Desktop Navbar */}
       <div className="hidden md:block">
-        <nav className="flex justify-center space-x-8 py-4 bg-slate-950 border-b border-slate-300">
+        <nav className="flex justify-center space-x-8 py-4  ">
+        <Menu setActive={setActive}>
           {navData.map((item) => (
-            <Dropdown key={item.title} item={item} />
+            <Dropdown key={item.title} item={item}  setActive={setActive} active={active}/>
           ))}
+          </Menu>
         </nav>
       </div>
 
@@ -110,10 +127,10 @@ export const Navbar = ({ className }: { className?: string }) => {
           animate={{ x: 0 }}
           exit={{ x: "100%" }}
           transition={{ ...transition, ease: "easeInOut" }}
-          className="fixed top-0 right-0 w-64 h-full bg-slate-950 shadow-lg z-50 p-4"
+          className="fixed top-0 right-0 w-64 h-full bg-slate-950 shadow-lg z-50"
         >
           <button
-            className="text-slate-200 text-2xl absolute top-4 right-4"
+            className="text-slate-200 text-4xl absolute top-4 right-4"
             onClick={() => setIsSidebarOpen(false)}
             aria-label="Close Menu"
           >
@@ -124,7 +141,7 @@ export const Navbar = ({ className }: { className?: string }) => {
             <div>
               {/* Back Button */}
               <button
-                className="text-slate-200 text-lg"
+                className="text-slate-200 text-lg px-4"
                 onClick={handleBackButtonClick}
               >
                 &larr; 
@@ -137,9 +154,11 @@ export const Navbar = ({ className }: { className?: string }) => {
                     {navData
                       .find((item) => item.title === activeSection)
                       ?.links?.map((link) => (
-                        <HoveredLink key={link.href} href={link.href}>
-                          {link.name}
-                        </HoveredLink>
+                        <div className="border-b border-white p-2">
+                          <HoveredLink key={link.href} href={link.href}>
+                            {link.name}
+                          </HoveredLink>
+                        </div>
                       ))}
                   </div>
                 )}
@@ -148,20 +167,28 @@ export const Navbar = ({ className }: { className?: string }) => {
                     {navData
                       .find((item) => item.title === activeSection)
                       ?.products?.map((product) => (
-                        <ProductItem key={product.href} {...product} />
+                        <div className="border-b border-white p-2">
+                          <ProductItem key={product.href} {...product} />
+                        </div>
                       ))}
                   </div>
                 )}
               </div>
             </div>
           ) : (
-            navData.map((item) => (
-              <SidebarItem
-                key={item.title}
-                item={item}
-                onCategoryClick={handleCategoryClick}
-              />
-            ))
+            
+            <div>
+              <div className="text-slate-100 text-2xl font-bold p-4">
+                SideMenu
+              </div>  
+              {navData.map((item) => (
+                <SidebarItem
+                  key={item.title}
+                  item={item}
+                  onCategoryClick={handleCategoryClick}
+                />
+              ))}
+            </div>
           )}
         </div>
         </motion.div>
@@ -170,27 +197,43 @@ export const Navbar = ({ className }: { className?: string }) => {
   );
 };
 
-function Dropdown({ item }: { item: typeof navData[number] }) {
+function Dropdown({
+  item,
+  setActive,
+  active,
+}: {
+  item: typeof navData[number];
+  setActive: React.Dispatch<React.SetStateAction<string | null>>;
+  active: string | null;
+}) {
+  const isActive = active === item.title;
+
   return (
-    <div className="group relative">
-      <button className="text-slate-200 hover:underline">{item.title}</button>
-      <div className="absolute hidden group-hover:block bg-slate-950 p-4 rounded-lg shadow-lg">
-        {item.links ? (
-          <div className="flex flex-col space-y-2">
-            {item.links.map((link) => (
-              <HoveredLink key={link.href} href={link.href}>
-                {link.name}
-              </HoveredLink>
-            ))}
-          </div>
-        ) : (
-          <div className="grid grid-cols-2 gap-4">
-            {item.products?.map((product) => (
-              <ProductItem key={product.href} {...product} />
-            ))}
-          </div>
-        )}
-      </div>
+    <div
+      className="group relative"
+      onMouseEnter={() => setActive(item.title)}
+      onMouseLeave={() => setActive(null)}
+    >
+      <MenuItem setActive={setActive} active={active} item={item.title}>
+      {isActive && (
+          item.links ? (
+            <div className="flex flex-col space-y-4 text-sm">
+              {item.links.map((link) => (
+                <HoveredLink key={link.href} href={link.href}>
+                  {link.name}
+                </HoveredLink>
+              ))}
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 gap-4">
+              {item.products?.map((product) => (
+                <ProductItem key={product.href} {...product} />
+              ))}
+            </div>
+          )
+          
+      )}
+      </MenuItem>
     </div>
   );
 }
@@ -203,10 +246,11 @@ function SidebarItem({
   onCategoryClick: (category: string, contentType: "links" | "products" | null) => void;
 }) {
   return (
-    <div>
+    <div className="border-b mb-2 p-2">
       {/* Main category button */}
+      
       <button
-        className="text-slate-100 text-xl font-bold"
+        className="text-slate-100 text-xl font-medium"
         onClick={() => onCategoryClick(item.title, item.links ? "links" : "products")}
       >
         {item.title}
@@ -215,13 +259,66 @@ function SidebarItem({
   );
 }
 
-function HoveredLink({ children, href }: { children: React.ReactNode; href: string }) {
+export const MenuItem = ({
+  setActive,
+  active,
+  item,
+  children,
+}: {
+  setActive: (item: string) => void;
+  active: string | null;
+  item: string;
+  children?: React.ReactNode;
+}) => {
   return (
-    <Link href={href} className="text-slate-400 hover:text-slate-200">
-      {children}
-    </Link>
+    <div onMouseEnter={() => setActive(item)} className="relative">
+      <motion.p
+        transition={{ duration: 0.3 }}
+        className="cursor-pointer text-slate-100 hover:opacity-[0.9]"
+      >
+        {item}
+      </motion.p>
+      {active !== null && (
+        <motion.div
+          initial={{ opacity: 0, scale: 0.85, y: 10 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          transition={transition}
+        >
+          {active === item && (
+            <div className="absolute top-[calc(100%_+_1.2rem)] left-1/2 transform -translate-x-1/2 pt-4">
+              <motion.div
+                transition={transition}
+                layoutId="active"
+                className="bg-slate-950 backdrop-blur-sm rounded-2xl overflow-hidden border border-slate-300 shadow-xl"
+              >
+                <motion.div layout className="w-max h-full p-4">
+                  {children}
+                </motion.div>
+              </motion.div>
+            </div>
+          )}
+        </motion.div>
+      )}
+    </div>
   );
-}
+};
+
+export const Menu = ({
+  setActive,
+  children,
+}: {
+  setActive: (item: string | null) => void;
+  children: React.ReactNode;
+}) => {
+  return (
+    <nav
+      onMouseLeave={() => setActive(null)}
+      className="relative rounded-full border border-slate-300 bg-slate-950 shadow-input flex justify-center space-x-4 px-8 py-4"
+    >
+      {children}
+    </nav>
+  );
+};
 
 function ProductItem({
   name,

@@ -5,6 +5,8 @@ const nextConfig: NextConfig = {
     domains: [
       "cdn.prod.website-files.com",
       "assets.aceternity.com",
+      "images.unsplash.com",
+      "plus.unsplash.com",
     ], // Add the external domain here
   },
 };
